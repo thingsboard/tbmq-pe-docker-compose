@@ -1,0 +1,114 @@
+#
+# ThingsBoard, Inc. ("COMPANY") CONFIDENTIAL
+#
+# Copyright © 2016-2025 ThingsBoard, Inc. All Rights Reserved.
+#
+# NOTICE: All information contained herein is, and remains
+# the property of ThingsBoard, Inc. and its suppliers,
+# if any.  The intellectual and technical concepts contained
+# herein are proprietary to ThingsBoard, Inc.
+# and its suppliers and may be covered by U.S. and Foreign Patents,
+# patents in process, and are protected by trade secret or copyright law.
+#
+# Dissemination of this information or reproduction of this material is strictly forbidden
+# unless prior written permission is obtained from COMPANY.
+#
+# Access to the source code contained herein is hereby forbidden to anyone except current COMPANY employees,
+# managers or contractors who have executed Confidentiality and Non-disclosure agreements
+# explicitly covering such access.
+#
+# The copyright notice above does not evidence any actual or intended publication
+# or disclosure  of  this source code, which includes
+# information that is confidential and/or proprietary, and is a trade secret, of  COMPANY.
+# ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC  PERFORMANCE,
+# OR PUBLIC DISPLAY OF OR THROUGH USE  OF THIS  SOURCE CODE  WITHOUT
+# THE EXPRESS WRITTEN CONSENT OF COMPANY IS STRICTLY PROHIBITED,
+# AND IN VIOLATION OF APPLICABLE LAWS AND INTERNATIONAL TREATIES.
+# THE RECEIPT OR POSSESSION OF THIS SOURCE CODE AND/OR RELATED INFORMATION
+# DOES NOT CONVEY OR IMPLY ANY RIGHTS TO REPRODUCE, DISCLOSE OR DISTRIBUTE ITS CONTENTS,
+# OR TO MANUFACTURE, USE, OR SELL ANYTHING THAT IT  MAY DESCRIBE, IN WHOLE OR IN PART.
+#
+
+services:
+  # Valkey cluster
+  valkey-node-0:
+    container_name: "${VALKEY_NODE_0_NAME}"
+    image: valkey/valkey:8.0
+    volumes:
+      - valkey-cluster-data-0:/data
+    command: valkey-server --port 6379 --requirepass thingsboard --masterauth thingsboard --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly no
+
+  valkey-node-1:
+    container_name: "${VALKEY_NODE_1_NAME}"
+    image: valkey/valkey:8.0
+    volumes:
+      - valkey-cluster-data-1:/data
+    depends_on:
+      - valkey-node-0
+    command: valkey-server --port 6379 --requirepass thingsboard --masterauth thingsboard --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly no
+
+  valkey-node-2:
+    container_name: "${VALKEY_NODE_2_NAME}"
+    image: valkey/valkey:8.0
+    volumes:
+      - valkey-cluster-data-2:/data
+    depends_on:
+      - valkey-node-1
+    command: valkey-server --port 6379 --requirepass thingsboard --masterauth thingsboard --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly no
+
+  valkey-node-3:
+    container_name: "${VALKEY_NODE_3_NAME}"
+    image: valkey/valkey:8.0
+    volumes:
+      - valkey-cluster-data-3:/data
+    depends_on:
+      - valkey-node-2
+    command: valkey-server --port 6379 --requirepass thingsboard --masterauth thingsboard --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly no
+
+  valkey-node-4:
+    container_name: "${VALKEY_NODE_4_NAME}"
+    image: valkey/valkey:8.0
+    volumes:
+      - valkey-cluster-data-4:/data
+    depends_on:
+      - valkey-node-3
+    command: valkey-server --port 6379 --requirepass thingsboard --masterauth thingsboard --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly no
+
+  valkey-node-5:
+    container_name: "${VALKEY_NODE_5_NAME}"
+    image: valkey/valkey:8.0
+    volumes:
+      - valkey-cluster-data-5:/data
+    depends_on:
+      - valkey-node-0
+      - valkey-node-1
+      - valkey-node-2
+      - valkey-node-3
+      - valkey-node-4
+    command: valkey-server --port 6379 --requirepass thingsboard --masterauth thingsboard --cluster-enabled yes --cluster-config-file nodes.conf --cluster-node-timeout 5000 --appendonly no
+
+  # TBMQ setup to use valkey-cluster
+  tbmq1:
+    env_file:
+      - cache-valkey-cluster.env
+    depends_on:
+      - valkey-node-5
+  tbmq2:
+    env_file:
+      - cache-valkey-cluster.env
+    depends_on:
+      - valkey-node-5
+
+volumes:
+  valkey-cluster-data-0:
+    external: true
+  valkey-cluster-data-1:
+    external: true
+  valkey-cluster-data-2:
+    external: true
+  valkey-cluster-data-3:
+    external: true
+  valkey-cluster-data-4:
+    external: true
+  valkey-cluster-data-5:
+    external: true
