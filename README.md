@@ -1,4 +1,4 @@
-# Docker configuration for TBMQ
+# Docker configuration for TBMQ PE
 
 This folder containing scripts and Docker Compose configurations to run TBMQ.
 
