@@ -1,0 +1,141 @@
+#
+# ThingsBoard, Inc. ("COMPANY") CONFIDENTIAL
+#
+# Copyright © 2016-2025 ThingsBoard, Inc. All Rights Reserved.
+#
+# NOTICE: All information contained herein is, and remains
+# the property of ThingsBoard, Inc. and its suppliers,
+# if any.  The intellectual and technical concepts contained
+# herein are proprietary to ThingsBoard, Inc.
+# and its suppliers and may be covered by U.S. and Foreign Patents,
+# patents in process, and are protected by trade secret or copyright law.
+#
+# Dissemination of this information or reproduction of this material is strictly forbidden
+# unless prior written permission is obtained from COMPANY.
+#
+# Access to the source code contained herein is hereby forbidden to anyone except current COMPANY employees,
+# managers or contractors who have executed Confidentiality and Non-disclosure agreements
+# explicitly covering such access.
+#
+# The copyright notice above does not evidence any actual or intended publication
+# or disclosure  of  this source code, which includes
+# information that is confidential and/or proprietary, and is a trade secret, of  COMPANY.
+# ANY REPRODUCTION, MODIFICATION, DISTRIBUTION, PUBLIC  PERFORMANCE,
+# OR PUBLIC DISPLAY OF OR THROUGH USE  OF THIS  SOURCE CODE  WITHOUT
+# THE EXPRESS WRITTEN CONSENT OF COMPANY IS STRICTLY PROHIBITED,
+# AND IN VIOLATION OF APPLICABLE LAWS AND INTERNATIONAL TREATIES.
+# THE RECEIPT OR POSSESSION OF THIS SOURCE CODE AND/OR RELATED INFORMATION
+# DOES NOT CONVEY OR IMPLY ANY RIGHTS TO REPRODUCE, DISCLOSE OR DISTRIBUTE ITS CONTENTS,
+# OR TO MANUFACTURE, USE, OR SELL ANYTHING THAT IT  MAY DESCRIBE, IN WHOLE OR IN PART.
+#
+
+services:
+  postgres:
+    restart: always
+    image: "postgres:17"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "5"
+    environment:
+      POSTGRES_DB: thingsboard_mqtt_broker
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - tbmq-postgres-data:/var/lib/postgresql/data
+  kafka:
+    restart: always
+    image: "apache/kafka:4.0.0"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "5"
+    environment:
+      KAFKA_NODE_ID: 0
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+    volumes:
+      - tbmq-kafka-data:/var/lib/kafka/data
+      - tbmq-kafka-secrets:/etc/kafka/secrets
+      - tbmq-kafka-config:/mnt/shared/config
+  valkey:
+    restart: always
+    image: "valkey/valkey:8.0"
+    volumes:
+      - tbmq-valkey-data:/data
+  tbmq:
+    restart: always
+    image: "thingsboard/tbmq-pe:2.2.0PE-SNAPSHOT"
+    depends_on:
+      - postgres
+      - kafka
+      - valkey
+    ports:
+      - "8083:8083"
+      - "1883:1883"
+      - "8084:8084"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "5"
+    environment:
+      TB_SERVICE_ID: tbmq
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/thingsboard_mqtt_broker
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      TB_KAFKA_SERVERS: kafka:9092
+      REDIS_HOST: valkey
+      SECURITY_MQTT_BASIC_ENABLED: "true"
+      #JAVA_OPTS: "-Xmx2048M -Xms2048M -Xss384k -XX:+AlwaysPreTouch"
+    volumes:
+      - tbmq-logs:/var/log/thingsboard-mqtt-broker
+      - tbmq-data:/data
+  tbmq-integration-executor:
+    restart: always
+    image: "thingsboard/tbmq-pe-integration-executor:2.2.0PE-SNAPSHOT"
+    depends_on:
+      - kafka
+      - tbmq
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "5"
+    environment:
+      TB_SERVICE_ID: tbmq-ie
+      TB_KAFKA_SERVERS: kafka:9092
+      #JAVA_OPTS: "-Xmx2048M -Xms2048M -Xss384k -XX:+AlwaysPreTouch"
+    volumes:
+      - tbmq-ie-logs:/var/log/tbmq-integration-executor
+
+volumes:
+  tbmq-postgres-data:
+    external: true
+  tbmq-kafka-data:
+    external: true
+  tbmq-kafka-secrets:
+    external: true
+  tbmq-kafka-config:
+    external: true
+  tbmq-valkey-data:
+    external: true
+  tbmq-logs:
+    external: true
+  tbmq-data:
+    external: true
+  tbmq-ie-logs:
+    external: true
