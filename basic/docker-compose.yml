@@ -101,6 +101,7 @@ services:
       REDIS_HOST: valkey
       SECURITY_MQTT_BASIC_ENABLED: "true"
       TBMQ_LICENSE_SECRET: YOUR_LICENSE_KEY_HERE
+      TBMQ_LICENSE_INSTANCE_DATA_FILE: /data/tbmq-instance-license.data
       #JAVA_OPTS: "-Xmx2048M -Xms2048M -Xss384k -XX:+AlwaysPreTouch"
     volumes:
       - tbmq-logs:/var/log/thingsboard-mqtt-broker
