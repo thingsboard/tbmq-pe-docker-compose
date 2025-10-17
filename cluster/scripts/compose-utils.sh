@@ -36,6 +36,8 @@ readonly MY_VOLUMES=(
   "tbmq-kafka-config"
   "tbmq1-logs"
   "tbmq2-logs"
+  "tbmq1-data"
+  "tbmq2-data"
   "tbmq-config"
   "tbmq-haproxy-config"
   "tbmq-haproxy-letsencrypt"

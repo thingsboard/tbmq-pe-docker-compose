@@ -69,6 +69,7 @@ services:
     volumes:
       - tbmq-config:/config
       - tbmq1-logs:/var/log/thingsboard-mqtt-broker
+      - tbmq1-data:/data
     #      - PATH_TO_CERTS:/config/certificates
     depends_on:
       - postgres
@@ -94,6 +95,7 @@ services:
     volumes:
       - tbmq-config:/config
       - tbmq2-logs:/var/log/thingsboard-mqtt-broker
+      - tbmq2-data:/data
     #      - PATH_TO_CERTS:/config/certificates
     depends_on:
       - postgres
