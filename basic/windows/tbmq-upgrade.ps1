@@ -111,7 +111,7 @@ try {
 
             docker compose rm tbmq
 
-            docker compose up -d tbmq --no-deps
+            docker compose up -d tbmq tbmq-integration-executor --no-deps
         }
         "V1" {
             docker-compose stop tbmq
@@ -132,7 +132,7 @@ try {
 
             docker-compose rm tbmq
 
-            docker-compose up -d tbmq --no-deps
+            docker-compose up -d tbmq tbmq-integration-executor --no-deps
         }
         default {
             # unknown option
