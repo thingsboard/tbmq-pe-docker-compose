@@ -184,6 +184,10 @@ volumes:
     external: true
   tbmq2-logs:
     external: true
+  tbmq1-data:
+    external: true
+  tbmq2-data:
+    external: true
   tbmq-config:
     external: true
   tbmq-haproxy-config:
