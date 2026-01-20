@@ -45,7 +45,7 @@ try {
 
     # Define TBMQ versions
     $old_version = "2.2.0"
-    $new_version = "2.2.0PE-SNAPSHOT"
+    $new_version = "2.2.0PE"
 
     # Define TBMQ images
     $old_image = "image: `"thingsboard/tbmq:$old_version`""
