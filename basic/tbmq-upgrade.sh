@@ -53,13 +53,22 @@ set -u
 old_version="2.2.0PE"
 new_version="2.3.0PE"
 
+# Define CE version for CE to PE upgrade
+ce_version="2.3.0"
+
 # Define TBMQ images
 old_image="image: \"thingsboard/tbmq-pe:$old_version\""
 new_image="image: \"thingsboard/tbmq-pe:$new_version\""
 
+# Define CE TBMQ images (for CE to PE upgrade)
+ce_image="image: \"thingsboard/tbmq:$ce_version\""
+
 # Define TBMQ IE images
 old_ie_image="image: \"thingsboard/tbmq-pe-integration-executor:$old_version\""
 new_ie_image="image: \"thingsboard/tbmq-pe-integration-executor:$new_version\""
+
+# Define CE TBMQ IE images (for CE to PE upgrade)
+ce_ie_image="image: \"thingsboard/tbmq-integration-executor:$ce_version\""
 
 # Define DB variables
 db_url="jdbc:postgresql://postgres:5432/thingsboard_mqtt_broker"
@@ -76,7 +85,23 @@ docker pull thingsboard/tbmq-pe:$new_version
 cp docker-compose.yml docker-compose.yml.bak
 echo "Docker Compose file backup created: docker-compose.yml.bak"
 
-# Replace the TBMQ image version using sed
+# Replace the CE TBMQ image version using sed (for CE to PE upgrade)
+echo "Trying to replace the CE TBMQ image version from [$ce_version] to [$new_version]..."
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  sed -i "s#$ce_image#$new_image#g" docker-compose.yml
+else
+  sed -i '' "s#$ce_image#$new_image#g" docker-compose.yml
+fi
+
+# Replace the CE TBMQ IE image version using sed (for CE to PE upgrade)
+echo "Trying to replace the CE TBMQ Integration Executor image version from [$ce_version] to [$new_version]..."
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  sed -i "s#$ce_ie_image#$new_ie_image#g" docker-compose.yml
+else
+  sed -i '' "s#$ce_ie_image#$new_ie_image#g" docker-compose.yml
+fi
+
+# Replace the PE TBMQ image version using sed (for PE to PE upgrade)
 echo "Trying to replace the TBMQ image version from [$old_version] to [$new_version]..."
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   sed -i "s#$old_image#$new_image#g" docker-compose.yml
@@ -84,7 +109,7 @@ else
   sed -i '' "s#$old_image#$new_image#g" docker-compose.yml
 fi
 
-# Replace the TBMQ IE image version using sed
+# Replace the PE TBMQ IE image version using sed (for PE to PE upgrade)
 echo "Trying to replace the TBMQ Integration Executor image version from [$old_version] to [$new_version]..."
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   sed -i "s#$old_ie_image#$new_ie_image#g" docker-compose.yml

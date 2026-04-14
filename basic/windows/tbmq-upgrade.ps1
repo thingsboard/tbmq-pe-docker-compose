@@ -43,13 +43,22 @@ try {
     $old_version = "2.2.0PE"
     $new_version = "2.3.0PE"
 
+    # Define CE version for CE to PE upgrade
+    $ce_version = "2.3.0"
+
     # Define TBMQ images
     $old_image = "image: `"thingsboard/tbmq-pe:$old_version`""
     $new_image = "image: `"thingsboard/tbmq-pe:$new_version`""
 
+    # Define CE TBMQ images (for CE to PE upgrade)
+    $ce_image = "image: `"thingsboard/tbmq:$ce_version`""
+
     # Define TBMQ IE images
     $old_ie_image = "image: `"thingsboard/tbmq-pe-integration-executor:$old_version`""
     $new_ie_image = "image: `"thingsboard/tbmq-pe-integration-executor:$new_version`""
+
+    # Define CE TBMQ IE images (for CE to PE upgrade)
+    $ce_ie_image = "image: `"thingsboard/tbmq-integration-executor:$ce_version`""
 
     # Define DB variables
     $db_url = "jdbc:postgresql://postgres:5432/thingsboard_mqtt_broker"
@@ -64,12 +73,22 @@ try {
     Copy-Item -Path "docker-compose.yml" -Destination "docker-compose.yml.bak" -ErrorAction Stop
     Write-Host "Docker Compose file backup created: docker-compose.yml.bak"
 
-    # Replace the TBMQ image version using PowerShell's Get-Content and Set-Content
+    # Replace the CE TBMQ image version (for CE to PE upgrade)
+    $composeFileContent = Get-Content -Path "docker-compose.yml"
+    $updatedComposeContent = $composeFileContent -replace [regex]::Escape($ce_image), $new_image
+    $updatedComposeContent | Set-Content -Path "docker-compose.yml"
+
+    # Replace the CE TBMQ IE image version (for CE to PE upgrade)
+    $composeFileContent = Get-Content -Path "docker-compose.yml"
+    $updatedComposeContent = $composeFileContent -replace [regex]::Escape($ce_ie_image), $new_ie_image
+    $updatedComposeContent | Set-Content -Path "docker-compose.yml"
+
+    # Replace the PE TBMQ image version (for PE to PE upgrade)
     $composeFileContent = Get-Content -Path "docker-compose.yml"
     $updatedComposeContent = $composeFileContent -replace [regex]::Escape($old_image), $new_image
     $updatedComposeContent | Set-Content -Path "docker-compose.yml"
 
-    # Replace the TBMQ IE image version using PowerShell's Get-Content and Set-Content
+    # Replace the PE TBMQ IE image version (for PE to PE upgrade)
     $composeFileContent = Get-Content -Path "docker-compose.yml"
     $updatedComposeContent = $composeFileContent -replace [regex]::Escape($old_ie_image), $new_ie_image
     $updatedComposeContent | Set-Content -Path "docker-compose.yml"
