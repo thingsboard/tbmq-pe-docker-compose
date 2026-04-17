@@ -40,7 +40,7 @@ ADDITIONAL_CACHE_ARGS=$(additionalComposeCacheArgs) || exit $?
 
 ADDITIONAL_STARTUP_SERVICES=$(additionalStartupServices) || exit $?
 
-checkVolumes
+checkVolumes --create
 
 COMPOSE_ARGS_PULL="\
       --env-file ./.env \
@@ -54,7 +54,7 @@ COMPOSE_ARGS_UP="\
       up -d ${ADDITIONAL_STARTUP_SERVICES}"
 
 COMPOSE_ARGS_RUN="\
-      --env-file ./.env --env-file ./tbmq.env \
+      --env-file ./.env \
       -f docker-compose.yml ${ADDITIONAL_CACHE_ARGS} \
       run --no-deps --rm -e UPGRADE_TB=true -e FROM_VERSION=${fromVersion} \
       tbmq1"
