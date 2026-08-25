@@ -65,7 +65,7 @@ In case you want to remove docker volumes for all the containers please execute 
 
 It could be useful to update logs (enable DEBUG/TRACE logs) in runtime or change TBMQ or HAProxy configs. In order to do
 this you need to make changes, for example, to the
-[haproxy.cfg](/docker/haproxy/config/haproxy.cfg) or [logback.xml](/docker/tbmq/conf/logback.xml) file.
+[haproxy.cfg](haproxy/config/haproxy.cfg) or [logback.xml](tbmq/conf/logback.xml) file.
 Afterward, execute the next command to apply the changes for the container:
 
 ```
@@ -97,4 +97,4 @@ After that execute the following commands:
 ./scripts/docker-start-services.sh
 ```
 
-See [Upgrade Instructions](https://thingsboard.io/docs/mqtt-broker/install/upgrade-instructions/) for more details.
+See [Upgrade Instructions](https://tbmq.io/docs/pe/installation/upgrade-instructions/) for more details.
