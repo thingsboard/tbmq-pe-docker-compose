@@ -50,11 +50,11 @@ function compose_version() {
 set -u
 
 # Define TBMQ versions
-old_version="2.2.0PE"
-new_version="2.3.0PE"
+old_version="2.3.0PE"
+new_version="2.4.0PE"
 
 # Define CE version for CE to PE upgrade
-ce_version="2.3.0"
+ce_version="2.4.0"
 
 # Define TBMQ images
 old_image="image: \"thingsboard/tbmq-pe:$old_version\""
