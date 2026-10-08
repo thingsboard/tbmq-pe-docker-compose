@@ -40,11 +40,11 @@ try {
     Write-Host "Docker Compose version is: $COMPOSE_VERSION"
 
     # Define TBMQ versions
-    $old_version = "2.3.0PE"
-    $new_version = "2.4.0PE"
+    $old_version = "2.4.0PE"
+    $new_version = "2.4.1PE"
 
     # Define CE version for CE to PE upgrade
-    $ce_version = "2.4.0"
+    $ce_version = "2.4.1"
 
     # Define TBMQ images
     $old_image = "image: `"thingsboard/tbmq-pe:$old_version`""
